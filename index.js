@@ -4,10 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import serverResponse from "./utils/serverResponse.js";
-import { addUser } from "./services/User.js";
-import { hashPassword } from "./utils/hashPassword.js";
-import { addUserController, deleteUserController, getUserByIdController, updateUserController, updateUserPasswordController } from "./contrellers/User.js";
+import { addFriendController, addUserController, deleteUserController, getUserByIdController, updateUserController, updateUserPasswordController } from "./contrellers/User.js";
 
 dotenv.config();
 
@@ -27,6 +24,7 @@ app.get("/api/user/:id", getUserByIdController);
 app.post("/api/user", addUserController);
 app.put("/api/user/:id", updateUserController);
 app.put("/api/user/password/:id", updateUserPasswordController);
+app.put("/api/addFriend", addFriendController);
 app.delete("/api/user/:id", deleteUserController);
 
 

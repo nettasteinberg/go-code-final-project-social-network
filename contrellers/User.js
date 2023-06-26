@@ -59,6 +59,7 @@ export const deleteUserController = async (req, res) => {
 }
 
 export const updateUserController = async (req, res) => {
+    console.log("whhhhhat?")
     const updates = Object.keys(req.body);
     let isValidOperation = updates.every((update) => userAllowedUpdates.includes(update));
     if (!isValidOperation) {
@@ -68,9 +69,10 @@ export const updateUserController = async (req, res) => {
         const id = req.params.id;
         const user = await getUserById({ _id: id });
         if (!user) {
-            serverResponse(res, 404, { message: `Invalid updates - user with id ${id} doesn't exist` });
+            return serverResponse(res, 404, { message: `Invalid updates - user with id ${id} doesn't exist` });
         }
         updates.forEach((update) => (user[update] = req.body[update]));
+        user.updatedAt = Date.now();
         await user.save();
         return serverResponse(res, 200, user);
     } catch (e) {
@@ -90,12 +92,13 @@ export const updateUserPasswordController = async (req, res) => {
         const id = req.params.id;
         const user = await getUserById({ _id: id });
         if (!user) {
-            serverResponse(res, 404, { message: `Invalid updates - user with id ${id} doesn't exist` });
+            return serverResponse(res, 404, { message: `Invalid updates - user with id ${id} doesn't exist` });
         }
         if (!enforceStrongPassword(req.body.password)) {
             return serverResponse(res, 400, { message: "The password is too weak, it should be no fewer than 8 characters, with at least one uppercase letter, at least one lowercase letter, at least one digit and at least one special character"});
         }
         user.password = await hashPassword(req.body.password);
+        user.updatedAt = Date.now();
         await user.save();
         return serverResponse(res, 200, user);
     } catch (e) {
@@ -103,4 +106,23 @@ export const updateUserPasswordController = async (req, res) => {
             message: "Internal error while trying to update user"
         });
     }
+}
+
+export const addFriendController = async (req, res) => {
+    try {
+        const friends = {...req.body};
+        const user = await getUserById({_id: friends.userId});
+        const newFriend = await getUserById({_id: friends.friendId});
+        if (!user || !newFriend) {
+            return serverResponse(res, 404, { message: `Either the user or the new friend doesn't exist` });
+        }
+        user.friends.push(newFriend);
+        await user.save();
+        return serverResponse(res, 200, user);
+    } catch (e) {
+        return serverResponse(res, 500, {
+            message: "Internal error while trying to add a user to the friends list"
+        });
+    }
+
 }
