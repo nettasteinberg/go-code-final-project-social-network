@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { addFriendController, addUserController, deleteUserController, getAllFriendsByUserId, getUserByIdController, updateUserController, updateUserPasswordController } from "./controllers/User.js";
+import { addFriendController, addUserController, deleteUserController, getAllFriendsByUserIdController, getUserByIdController, updateUserController, updateUserPasswordController } from "./controllers/User.js";
 import { addPostController, deletePostByIdController, getAllPostsByUserIdController, getPostByPostIdController, updatePostByPostIdController } from "./controllers/Post.js";
 
 dotenv.config();
@@ -22,7 +22,7 @@ app.use(express.static('client/build'));
 /* ********************************************************************************************************************* */
 
 app.get("/api/user/:id", getUserByIdController);
-app.get("/api/user/friends/:id", getAllFriendsByUserId);
+app.get("/api/user/friends/:id", getAllFriendsByUserIdController);
 app.post("/api/user", addUserController);
 app.put("/api/user/:id", updateUserController);
 app.put("/api/user/password/:id", updateUserPasswordController);
@@ -33,7 +33,7 @@ app.post("/api/post", addPostController);
 app.get("/api/posts/:id", getAllPostsByUserIdController);
 app.get("/api/post/:id", getPostByPostIdController);
 app.put("/api/post/:id", updatePostByPostIdController);
-app.delete("/api/post/:id", deletePostByIdController)
+app.delete("/api/post/:id", deletePostByIdController);
 
 /* ********************************************************************************************************************* */
 

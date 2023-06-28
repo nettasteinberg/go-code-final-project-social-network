@@ -40,7 +40,7 @@ export const getUserByIdController = async (req, res) => {
     }
 }
 
-export const getAllFriendsByUserId = async (req, res) => {
+export const getAllFriendsByUserIdController = async (req, res) => {
     try {
         const id = req.params.id;
         const user = await getUserById(id);
