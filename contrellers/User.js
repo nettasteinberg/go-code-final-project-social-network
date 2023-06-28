@@ -59,7 +59,6 @@ export const deleteUserController = async (req, res) => {
 }
 
 export const updateUserController = async (req, res) => {
-    console.log("whhhhhat?")
     const updates = Object.keys(req.body);
     let isValidOperation = updates.every((update) => userAllowedUpdates.includes(update));
     if (!isValidOperation) {
