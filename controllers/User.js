@@ -21,10 +21,8 @@ export const addUserController = async (req, res) => {
         const user = await addUser(newUser);
         serverResponse(res, 200, user);
     } catch (e) {
-        console.log(e);
         serverResponse(res, 500, e);
     }
-
 }
 
 export const getUserByIdController = async (req, res) => {
