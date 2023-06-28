@@ -100,7 +100,7 @@ export const deletePostByIdController = async (req, res) => {
         return serverResponse(res, 200, deletedPost);
     } catch (e) {
         return serverResponse(res, 500, {
-            message: "Internal error while trying to remove remove user"
+            message: "Internal error while trying to delete a post"
         });
     }
 }
