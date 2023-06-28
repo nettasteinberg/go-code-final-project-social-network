@@ -58,7 +58,7 @@ export const updatePostByPostIdController = async (req, res) => {
         }
         const userId = req.body.user;
         if (userId !== post.user.toString()) {
-            return serverResponse(res, 400, { message: "The user didn't post the post so it can't be updated" });
+            return serverResponse(res, 400, { message: "The user is not the original poster so the post can't be updated" });
         }
         const {content , picture} = req.body;
         let isValidUpdate = false;
@@ -91,7 +91,7 @@ export const deletePostByIdController = async (req, res) => {
         }
         const userId = req.body.user;
         if (userId !== post.user.toString()) {
-            return serverResponse(res, 400, { message: "The user didn't post the post so it can't be deleted" });
+            return serverResponse(res, 400, { message: "The user is not the original poster so the post can't be deleted" });
         }
         const deletedPost = await deletePost(postId);
         if (!deletePost) {
