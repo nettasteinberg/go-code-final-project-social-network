@@ -10,6 +10,6 @@ export const getPostByPostId = (postId) => {
     return Post.findOne({ _id: postId });
 }
 
-export const getAllUserPosts = (id) => {
+export const getAllUserPostsByUserId = (id) => {
     return Post.find({ user: id });
 }
