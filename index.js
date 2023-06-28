@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { addFriendController, addUserController, deleteUserController, getUserByIdController, updateUserController, updateUserPasswordController } from "./contrellers/User.js";
+import { addFriendController, addUserController, deleteUserController, getAllFriendsByUserId, getUserByIdController, updateUserController, updateUserPasswordController } from "./controllers/User.js";
 
 dotenv.config();
 
@@ -16,18 +16,17 @@ const { PORT, DB_USER, DB_PASS, DB_HOST, DB_NAME } = process.env;
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(express.static('client/build'))
+app.use(express.static('client/build'));
 
 /* ********************************************************************************************************************* */
 
 app.get("/api/user/:id", getUserByIdController);
+app.get("/api/user/friends/:id", getAllFriendsByUserId);
 app.post("/api/user", addUserController);
 app.put("/api/user/:id", updateUserController);
 app.put("/api/user/password/:id", updateUserPasswordController);
 app.put("/api/addFriend", addFriendController);
 app.delete("/api/user/:id", deleteUserController);
-
-
 
 /* ********************************************************************************************************************* */
 

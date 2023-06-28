@@ -5,7 +5,7 @@ export const getUserById = (id) => {
 }
 
 export const getUserByEmail = (email) => {
-    return User.findOne({email}).select("-__v")
+    return User.findOne({email}).select("-__v");
 }
 
 export const addUser = async (newUser) => {
@@ -15,5 +15,5 @@ export const addUser = async (newUser) => {
 }
 
 export const deleteUserById = (id) => {
-    return User.findOneAndDelete({_id:id})
+    return User.findOneAndDelete({_id:id});
 }
