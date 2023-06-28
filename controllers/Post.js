@@ -44,7 +44,7 @@ export const getPostByPostIdController = async (req, res) => {
         return serverResponse(res, 200, post);
     } catch (e) {
         return serverResponse(res, 500, {
-            message: "Internal error while trying to get all posts by user"
+            message: "Internal error while trying to get post"
         });
     }
 }

@@ -6,6 +6,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { addFriendController, addUserController, deleteUserController, getAllFriendsByUserIdController, getUserByIdController, updateUserController, updateUserPasswordController } from "./controllers/User.js";
 import { addPostController, deletePostByIdController, getAllPostsByUserIdController, getPostByPostIdController, updatePostByPostIdController } from "./controllers/Post.js";
+import { addCommentController, deleteCommentByIdController, getAllCommentsByPostIdController, getCommentByCommentIdController, updateCommentByCommentIdController } from "./controllers/Comment.js";
 
 dotenv.config();
 
@@ -34,6 +35,12 @@ app.get("/api/posts/:id", getAllPostsByUserIdController);
 app.get("/api/post/:id", getPostByPostIdController);
 app.put("/api/post/:id", updatePostByPostIdController);
 app.delete("/api/post/:id", deletePostByIdController);
+
+app.post("/api/comment", addCommentController);
+app.get("/api/comments/:id", getAllCommentsByPostIdController);
+app.get("/api/comment/:id", getCommentByCommentIdController);
+app.put("/api/comment/:id", updateCommentByCommentIdController);
+app.delete("/api/comment/:id", deleteCommentByIdController);
 
 /* ********************************************************************************************************************* */
 
