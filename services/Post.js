@@ -6,10 +6,14 @@ export const addPost = async (newPost) => {
     return post;
 }
 
-export const getPostByPostId = (postId) => {
+export const getPostById = (postId) => {
     return Post.findOne({ _id: postId });
 }
 
 export const getAllUserPostsByUserId = (id) => {
     return Post.find({ user: id });
+}
+
+export const deletePost = (id) => {
+    return Post.findOneAndDelete({ _id: id });
 }

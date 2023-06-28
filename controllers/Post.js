@@ -1,4 +1,4 @@
-import { addPost, getAllUserPostsByUserId, getPostByPostId } from "../services/Post.js";
+import { addPost, deletePost, getAllUserPostsByUserId, getPostById } from "../services/Post.js";
 import { getUserById } from "../services/User.js";
 import serverResponse from "../utils/serverResponse.js";
 
@@ -37,7 +37,7 @@ export const getAllPostsByUserIdController = async (req, res) => {
 export const getPostByPostIdController = async (req, res) => {
     try {
         const postId = req.params.id;
-        const post = await getPostByPostId(postId);
+        const post = await getPostById(postId);
         if (!post) {
             return serverResponse(res, 404, { message: "Post doesn't exist" });
         }
@@ -52,14 +52,12 @@ export const getPostByPostIdController = async (req, res) => {
 export const updatePostByPostIdController = async (req, res) => {
     try {
         const postId = req.params.id;
-        const post = await getPostByPostId(postId);
+        const post = await getPostById(postId);
         if (!post) {
             return serverResponse(res, 404, { message: "Post doesn't exist" });
         }
         const userId = req.body.user;
         if (userId !== post.user.toString()) {
-            console.log("userId", userId);
-            console.log("post.user", post.user);
             return serverResponse(res, 400, { message: "The user didn't post the post so it can't be updated" });
         }
         const {content , picture} = req.body;
@@ -82,4 +80,27 @@ export const updatePostByPostIdController = async (req, res) => {
             message: "Internal error while trying to update a post"
         });
     }
-} 
+}
+
+export const deletePostByIdController = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const post = await getPostById(postId);
+        if (!post) {
+            return serverResponse(res, 404, { message: "Post doesn't exist" });
+        }
+        const userId = req.body.user;
+        if (userId !== post.user.toString()) {
+            return serverResponse(res, 400, { message: "The user didn't post the post so it can't be deleted" });
+        }
+        const deletedPost = await deletePost(postId);
+        if (!deletePost) {
+            return serverResponse(res, 404, { message: "Post doesn't exist" });
+        }
+        return serverResponse(res, 200, deletedPost);
+    } catch (e) {
+        return serverResponse(res, 500, {
+            message: "Internal error while trying to remove remove user"
+        });
+    }
+}

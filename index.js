@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { addFriendController, addUserController, deleteUserController, getAllFriendsByUserId, getUserByIdController, updateUserController, updateUserPasswordController } from "./controllers/User.js";
-import { addPostController, getAllPostsByUserIdController, getPostByPostIdController, updatePostByPostIdController } from "./controllers/Post.js";
+import { addPostController, deletePostByIdController, getAllPostsByUserIdController, getPostByPostIdController, updatePostByPostIdController } from "./controllers/Post.js";
 
 dotenv.config();
 
@@ -33,6 +33,7 @@ app.post("/api/post", addPostController);
 app.get("/api/posts/:id", getAllPostsByUserIdController);
 app.get("/api/post/:id", getPostByPostIdController);
 app.put("/api/post/:id", updatePostByPostIdController);
+app.delete("/api/post/:id", deletePostByIdController)
 
 /* ********************************************************************************************************************* */
 
