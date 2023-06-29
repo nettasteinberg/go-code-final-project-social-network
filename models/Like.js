@@ -6,14 +6,25 @@ const likeSchema = new Schema({
         ref: "User",
         required: true,
     },
-    post: {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
+    likedObject: { 
+        type: Schema.Types.ObjectId, 
+        refPath: 'model_type',
+        required: true, 
     },
-    comment: {
-        type: Schema.Types.ObjectId,
-        ref: "Comment",
+    modelType: { 
+        type: String, 
+        enum: ["Post", "Comment"], 
+        required: true,
     }
+
+    // post: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Post",
+    // },
+    // comment: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Comment",
+    // }
 });
 
 export const Like = model("Like", likeSchema);

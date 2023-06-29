@@ -6,12 +6,11 @@ import serverResponse from "../utils/serverResponse.js";
 export const addCommentController = async (req, res) => {
     try {
         const newComment = { ...req.body };
-        console.log(newComment);
         if (Object.keys(newComment).length === 0) {
-            serverResponse(res, 400, "Bad request");
+            return serverResponse(res, 400, "Bad request");
         }
         const post = await addComment(newComment);
-        serverResponse(res, 200, post);
+        return serverResponse(res, 200, post);
     } catch (e) {
         return serverResponse(res, 500, {
             message: "Internal error while trying to add a comment"

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { addFriendController, addUserController, deleteUserController, getAllFriendsByUserIdController, getUserByIdController, updateUserController, updateUserPasswordController } from "./controllers/User.js";
 import { addPostController, deletePostByIdController, getAllPostsByUserIdController, getPostByPostIdController, updatePostByPostIdController } from "./controllers/Post.js";
 import { addCommentController, deleteCommentByIdController, getAllCommentsByPostIdController, getCommentByCommentIdController, updateCommentByCommentIdController } from "./controllers/Comment.js";
+import { addLikeToPostOrCommentController, deleteLikeByIdController, getLikeByIdController } from "./controllers/Like.js";
 
 dotenv.config();
 
@@ -41,6 +42,10 @@ app.get("/api/comments/:id", getAllCommentsByPostIdController);
 app.get("/api/comment/:id", getCommentByCommentIdController);
 app.put("/api/comment/:id", updateCommentByCommentIdController);
 app.delete("/api/comment/:id", deleteCommentByIdController);
+
+app.post("/api/like", addLikeToPostOrCommentController);
+app.get("/api/like/:id", getLikeByIdController);
+app.delete("/api/like/:id", deleteLikeByIdController);
 
 /* ********************************************************************************************************************* */
 
