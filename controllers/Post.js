@@ -1,6 +1,9 @@
+import { getAllCommentsByPostId } from "../services/Comment.js";
+import { deleteAllLikesByPostOrCommentId, getAllLikesByPostOrCommentId } from "../services/Like.js";
 import { addPost, deletePost, getAllUserPostsByUserId, getPostById } from "../services/Post.js";
 import { getUserById } from "../services/User.js";
 import serverResponse from "../utils/serverResponse.js";
+import { deleteLikesOnComment } from "./Comment.js";
 
 export const addPostController = async (req, res) => {
     try {
@@ -60,7 +63,7 @@ export const updatePostByPostIdController = async (req, res) => {
         if (userId !== post.user.toString()) {
             return serverResponse(res, 400, { message: "The user is not the original poster so the post can't be updated" });
         }
-        const {content , picture} = req.body;
+        const { content, picture } = req.body;
         let isValidUpdate = false;
         if (content !== "") {
             post["content"] = content;
@@ -85,13 +88,25 @@ export const updatePostByPostIdController = async (req, res) => {
 export const deletePostByIdController = async (req, res) => {
     try {
         const postId = req.params.id;
-        const post = await getPostById(postId);
-        if (!post) {
-            return serverResponse(res, 404, { message: "Post doesn't exist" });
+        // const post = await getPostById(postId);
+        // if (!post) {
+        //     return serverResponse(res, 404, { message: "Post doesn't exist" });
+        // }
+        // const userId = req.body.user;
+        // if (userId !== post.user.toString()) {
+        //     return serverResponse(res, 400, { message: "The user is not the original poster so the post can't be deleted" });
+        // }
+        const commentsOnPost = await getAllCommentsByPostId(postId);
+        for (const comment of commentsOnPost) {
+            const deletedComment = await deleteLikesOnComment(comment._id);
+            if (!deletedComment) {
+                console.log(`Comment ${comment._id} wasn't deleted properly`);
+            }
         }
-        const userId = req.body.user;
-        if (userId !== post.user.toString()) {
-            return serverResponse(res, 400, { message: "The user is not the original poster so the post can't be deleted" });
+        const arrayOfLikesOnComment = await getAllLikesByPostOrCommentId(true, postId);
+        const deleteLikesResponse = await deleteAllLikesByPostOrCommentId(true, postId);
+        if (deleteLikesResponse.deletedCount !== arrayOfLikesOnComment.length) {
+            console.log(`Not all likes of comment ${postId} were deleted from the DB`);
         }
         const deletedPost = await deletePost(postId);
         if (!deletePost) {

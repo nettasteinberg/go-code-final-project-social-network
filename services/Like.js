@@ -10,14 +10,14 @@ export const getLikeById = (likeId) => {
     return Like.findOne({ _id: likeId });
 }
 
-export const getAllLikesByPostId = (postId) => {
-    return Like.find({ likedObject: postId, modelType: "Post" });
-}
-
-export const getAllLikesByCommentId = (commentId) => {
-    return Like.find({ likedObject: commentId, modelType: "Comment" });
+export const getAllLikesByPostOrCommentId = (isPost, id) => {
+    return Like.find({ likedObject: id });
 }
 
 export const deleteLike = (id) => {
     return Like.findOneAndDelete({ _id: id });
+}
+
+export const deleteAllLikesByPostOrCommentId = (isPost, id) => {
+    return Like.deleteMany({ likedObject: id });
 }

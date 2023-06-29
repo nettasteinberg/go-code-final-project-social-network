@@ -16,15 +16,6 @@ const likeSchema = new Schema({
         enum: ["Post", "Comment"], 
         required: true,
     }
-
-    // post: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Post",
-    // },
-    // comment: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Comment",
-    // }
 });
 
 export const Like = model("Like", likeSchema);
