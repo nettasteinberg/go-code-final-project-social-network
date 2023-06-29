@@ -11,11 +11,11 @@ export const getLikeById = (likeId) => {
 }
 
 export const getAllLikesByPostId = (postId) => {
-    return Like.find({ post: postId });
+    return Like.find({ likedObject: postId, modelType: "Post" });
 }
 
 export const getAllLikesByCommentId = (commentId) => {
-    return Like.find({ comment: commentId });
+    return Like.find({ likedObject: commentId, modelType: "Comment" });
 }
 
 export const deleteLike = (id) => {
