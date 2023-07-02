@@ -21,3 +21,11 @@ export const deleteLike = (id) => {
 export const deleteAllLikesByPostOrCommentId = (isPost, id) => {
     return Like.deleteMany({ likedObject: id });
 }
+
+export const getLikesByUserId = (userId) => {
+    return Like.find({ user: userId });
+}
+
+export const deleteUserLikesByUserId = (userId) => {
+    return Like.deleteMany({ user: userId});
+}

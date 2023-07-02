@@ -85,29 +85,25 @@ export const updatePostByPostIdController = async (req, res) => {
     }
 }
 
+export const deleteCommentsAndLikesOnPost = async (postId) => {
+    const commentsOnPost = await getAllCommentsByPostId(postId);
+    for (const comment of commentsOnPost) {
+        const deletedComment = await deleteLikesOnComment(comment._id);
+        if (!deletedComment) {
+            console.log(`Comment ${comment._id} wasn't deleted properly`);
+        }
+    }
+    const arrayOfLikesOnComment = await getAllLikesByPostOrCommentId(true, postId);
+    const deleteLikesResponse = await deleteAllLikesByPostOrCommentId(true, postId);
+    if (deleteLikesResponse.deletedCount !== arrayOfLikesOnComment.length) {
+        console.log(`Not all likes of comment ${postId} were deleted from the DB`);
+    }
+}
+
 export const deletePostByIdController = async (req, res) => {
     try {
         const postId = req.params.id;
-        // const post = await getPostById(postId);
-        // if (!post) {
-        //     return serverResponse(res, 404, { message: "Post doesn't exist" });
-        // }
-        // const userId = req.body.user;
-        // if (userId !== post.user.toString()) {
-        //     return serverResponse(res, 400, { message: "The user is not the original poster so the post can't be deleted" });
-        // }
-        const commentsOnPost = await getAllCommentsByPostId(postId);
-        for (const comment of commentsOnPost) {
-            const deletedComment = await deleteLikesOnComment(comment._id);
-            if (!deletedComment) {
-                console.log(`Comment ${comment._id} wasn't deleted properly`);
-            }
-        }
-        const arrayOfLikesOnComment = await getAllLikesByPostOrCommentId(true, postId);
-        const deleteLikesResponse = await deleteAllLikesByPostOrCommentId(true, postId);
-        if (deleteLikesResponse.deletedCount !== arrayOfLikesOnComment.length) {
-            console.log(`Not all likes of comment ${postId} were deleted from the DB`);
-        }
+        await deleteCommentsAndLikesOnPost(postId);
         const deletedPost = await deletePost(postId);
         if (!deletePost) {
             return serverResponse(res, 404, { message: "Post doesn't exist" });

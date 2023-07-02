@@ -1,8 +1,11 @@
+import { deleteUserLikesByUserId } from "../services/Like.js";
+import { getAllUserPostsByUserId } from "../services/Post.js";
 import { addUser, deleteUserById, getUserById } from "../services/User.js";
 import { passwordAllowedUpdate, userAllowedUpdates } from "../utils/allowedUpdates.js";
 import { enforceStrongPassword } from "../utils/enforceStrongPassword.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import serverResponse from "../utils/serverResponse.js";
+import { deleteCommentsAndLikesOnPost } from "./Post.js";
 
 export const addUserController = async (req, res) => {
     try {
@@ -71,6 +74,12 @@ export const deleteUserController = async (req, res) => {
             friendToDeleteUserFrom.friends = newFriendsList;
             await friendToDeleteUserFrom.save();
         }
+        const userPosts = await getAllUserPostsByUserId(id);
+        for (const post of userPosts) {
+            await deleteCommentsAndLikesOnPost(post._id);
+        }
+        const deletedLikes = await deleteUserLikesByUserId(id);
+        console.log(`Removed ${deletedLikes.deletedCount} likes by user ${id}`);
         const deletedUser = await deleteUserById(id);
         return serverResponse(res, 200, deletedUser);
     } catch (e) {
