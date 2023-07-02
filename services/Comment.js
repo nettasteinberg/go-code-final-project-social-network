@@ -14,6 +14,10 @@ export const getAllCommentsByPostId = (postId) => {
     return Comment.find({ post: postId });
 }
 
+export const getAllCommentsByUserId = (userId) => {
+    return Comment.find ({ user: userId });
+}
+
 export const deleteComment = (id) => {
     return Comment.findOneAndDelete({ _id: id });
 }

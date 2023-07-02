@@ -80,9 +80,8 @@ export const updateCommentByCommentIdController = async (req, res) => {
 
 export const deleteLikesOnComment = async (commentId) => {
     const arrayOfLikesOnComment = await getAllLikesByPostOrCommentId(false, commentId);
-    console.log(arrayOfLikesOnComment)
     const deleteLikesResponse = await deleteAllLikesByPostOrCommentId(false, commentId);
-    console.log(deleteLikesResponse)
+    console.log(`Delete ${deleteLikesResponse.deletedCount} likes of comment ${commentId}`);
     if (deleteLikesResponse.deletedCount !== arrayOfLikesOnComment.length) {
         console.log(`Not all likes of comment ${commentId} were deleted from the DB`);
     }
@@ -92,16 +91,6 @@ export const deleteLikesOnComment = async (commentId) => {
 export const deleteCommentByIdController = async (req, res) => {
     try {
         const commentId = req.params.id;
-        // const comment = await getCommentById(commentId);
-        // if (!comment) {
-        //     return serverResponse(res, 404, { message: "Comment doesn't exist" });
-        // }
-        // const userId = req.body.user;
-        // const post = await getPostById(comment.post.toString());
-        // const postPoster = await getUserById(post.user.toString());
-        // if (userId !== comment.user.toString() && userId !== postPoster._id.toString()) {
-        //     return serverResponse(res, 400, { message: "The user is neither the original poster of the comment nor the original poster of the post, so the comment can't be deleted" });
-        // }
         const deletedComment = await deleteLikesOnComment(commentId);
         if (!deletedComment) {
             return serverResponse(res, 404, { message: "Comment doesn't exist" });
