@@ -1,4 +1,4 @@
-import { addLike, deleteLike, getLikeById } from "../services/Like.js";
+import { addLike, deleteAllLikesByPostOrCommentId, deleteLike, getAllLikesByPostOrCommentId, getLikeById } from "../services/Like.js";
 import serverResponse from "../utils/serverResponse.js";
 
 export const addLikeToPostOrCommentController = async (req, res) => {
@@ -28,6 +28,15 @@ export const getLikeByIdController = async (req, res) => {
         return serverResponse(res, 500, {
             message: "Internal error while trying to add a comment"
         });
+    }
+}
+
+export const deleteLikesOnCommentOrPost = async (id, isPost) => {
+    const arrayOfLikesOnComment = await getAllLikesByPostOrCommentId(id);
+    const deleteLikesResponse = await deleteAllLikesByPostOrCommentId(id);
+    console.log(`Delete ${deleteLikesResponse.deletedCount} likes of ${isPost ? "post" : "comment"} ${id}`);
+    if (deleteLikesResponse.deletedCount !== arrayOfLikesOnComment.length) {
+        console.log(`Not all likes of ${isPost ? "post" : "comment"} ${id} were deleted from the DB`);
     }
 }
 

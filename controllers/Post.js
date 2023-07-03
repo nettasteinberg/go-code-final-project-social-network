@@ -1,9 +1,9 @@
 import { getAllCommentsByPostId } from "../services/Comment.js";
-import { deleteAllLikesByPostOrCommentId, getAllLikesByPostOrCommentId } from "../services/Like.js";
-import { addPost, deletePost, getAllUserPostsByUserId, getPostById } from "../services/Post.js";
+import { addPost, deletePostFromDB, getAllUserPostsByUserId, getPostById } from "../services/Post.js";
 import { getUserById } from "../services/User.js";
 import serverResponse from "../utils/serverResponse.js";
-import { deleteLikesOnComment } from "./Comment.js";
+import { deleteComment } from "./Comment.js";
+import { deleteLikesOnCommentOrPost } from "./Like.js";
 
 export const addPostController = async (req, res) => {
     try {
@@ -85,27 +85,25 @@ export const updatePostByPostIdController = async (req, res) => {
     }
 }
 
-export const deleteCommentsAndLikesOnPost = async (postId) => {
+export const deletePost = async (postId) => {
+    await deleteLikesOnCommentOrPost(postId, true);
+    await deleteCommentsOnPost(postId);
+    await deletePostFromDB(postId);
+}
+
+const deleteCommentsOnPost = async (postId) => {
     const commentsOnPost = await getAllCommentsByPostId(postId);
     for (const comment of commentsOnPost) {
-        const deletedComment = await deleteLikesOnComment(comment._id);
-        console.log(`Deleted comment ${comment._id} of post ${postId}`);
+        const deletedComment = await deleteComment(comment._id);
         if (!deletedComment) {
-            console.log(`Comment ${comment._id} wasn't deleted properly`);
+            console.log(`Comment ${comment._id} of post ${postId} wasn't deleted properly`);
         }
-    }
-    const arrayOfLikesOnComment = await getAllLikesByPostOrCommentId(true, postId);
-    const deleteLikesResponse = await deleteAllLikesByPostOrCommentId(true, postId);
-    console.log(`Deleted ${deleteLikesResponse.deletedCount} likes of post ${postId}`);
-    if (deleteLikesResponse.deletedCount !== arrayOfLikesOnComment.length) {
-        console.log(`Not all likes of post ${postId} were deleted from the DB`);
     }
 }
 
 export const deletePostByIdController = async (req, res) => {
     try {
         const postId = req.params.id;
-        await deleteCommentsAndLikesOnPost(postId);
         const deletedPost = await deletePost(postId);
         if (!deletedPost) {
             return serverResponse(res, 404, { message: "Post doesn't exist" });

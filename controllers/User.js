@@ -1,13 +1,13 @@
-import { deleteComment, getAllCommentsByUserId } from "../services/Comment.js";
+import { getAllCommentsByUserId } from "../services/Comment.js";
 import { deleteUserLikesByUserId } from "../services/Like.js";
-import { deletePost, getAllUserPostsByUserId } from "../services/Post.js";
-import { addUser, deleteUserById, getUserById } from "../services/User.js";
+import { getAllUserPostsByUserId } from "../services/Post.js";
+import { addUser, deleteUserFromDBById, getUserById, updateUser } from "../services/User.js";
 import { passwordAllowedUpdate, userAllowedUpdates } from "../utils/allowedUpdates.js";
 import { enforceStrongPassword } from "../utils/enforceStrongPassword.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import serverResponse from "../utils/serverResponse.js";
-import { deleteLikesOnComment } from "./Comment.js";
-import { deleteCommentsAndLikesOnPost } from "./Post.js";
+import { deleteComment } from "./Comment.js";
+import { deletePost } from "./Post.js";
 
 export const addUserController = async (req, res) => {
     try {
@@ -60,6 +60,33 @@ export const getAllFriendsByUserIdController = async (req, res) => {
     }
 }
 
+const deleteUser = async (user) => {
+    await deleteUserFromFriendsLists(user);
+    const id = user._id;
+    await deleteUserLikesByUserId(id);
+    const userComments = await getAllCommentsByUserId(id);
+    for (const comment of userComments) {
+        await deleteComment(comment._id);
+    }
+    const userPosts = await getAllUserPostsByUserId(id);
+    for (const post of userPosts) {
+        await deletePost(post._id);
+    }
+    return await deleteUserFromDBById(user._id);
+}
+
+const deleteUserFromFriendsLists = async (user) => {
+    const friendsOfUserToDelete = [...user.friends];
+        for (const friendId of friendsOfUserToDelete) {
+            const friendToDeleteUserFrom = await getUserById(friendId);
+            const newFriendsList = [...friendToDeleteUserFrom.friends];
+            const ind = newFriendsList.findIndex(friendId => friendId.toString() === user._id);
+            newFriendsList.splice(ind, 1);
+            friendToDeleteUserFrom.friends = newFriendsList;
+            await updateUser(friendToDeleteUserFrom);
+        }
+}
+
 export const deleteUserController = async (req, res) => {
     try {
         const id = req.params.id;
@@ -67,39 +94,7 @@ export const deleteUserController = async (req, res) => {
         if (!userToDelete) {
             return serverResponse(res, 404, { message: "User doesn't exist" });
         }
-        const friendsOfUserToDelete = [...userToDelete.friends];
-        for (const friendId of friendsOfUserToDelete) {
-            const friendToDeleteUserFrom = await getUserById(friendId);
-            const newFriendsList = [...friendToDeleteUserFrom.friends];
-            const ind = newFriendsList.findIndex(friendId => friendId.toString() === id);
-            newFriendsList.splice(ind, 1);
-            friendToDeleteUserFrom.friends = newFriendsList;
-            await friendToDeleteUserFrom.save();
-        }
-        
-        const userPosts = await getAllUserPostsByUserId(id);
-        for (const post of userPosts) {
-            await deleteCommentsAndLikesOnPost(post._id);
-            console.log(`Deleted comment and likes on post ${post._id}`);
-            const deletedPost = await deletePost(post._id);
-            if (!deletedPost) {
-                console.log(`Post ${post._id} couldn't be deleted`);
-            } else {
-                console.log(`Post ${post._id} deleted`);
-            }
-        }
-        
-        const userComments = await getAllCommentsByUserId(id);
-        for (const comment of userComments) {
-            await deleteLikesOnComment(comment._id);
-            await deleteComment(comment._id);
-            console.log(`Deleted comment ${comment._id}`);
-        }
-
-        const deletedLikes = await deleteUserLikesByUserId(id);
-        console.log(`Removed ${deletedLikes.deletedCount} likes by user ${id}`);
-        
-        const deletedUser = await deleteUserById(id);
+        const deletedUser = await deleteUser(userToDelete);
         return serverResponse(res, 200, deletedUser);
     } catch (e) {
         return serverResponse(res, 500, {

@@ -18,6 +18,6 @@ export const getAllCommentsByUserId = (userId) => {
     return Comment.find ({ user: userId });
 }
 
-export const deleteComment = (id) => {
+export const deleteCommentFromDB = (id) => {
     return Comment.findOneAndDelete({ _id: id });
 }

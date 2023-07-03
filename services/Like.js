@@ -10,7 +10,7 @@ export const getLikeById = (likeId) => {
     return Like.findOne({ _id: likeId });
 }
 
-export const getAllLikesByPostOrCommentId = (isPost, id) => {
+export const getAllLikesByPostOrCommentId = (id) => {
     return Like.find({ likedObject: id });
 }
 
@@ -18,11 +18,11 @@ export const deleteLike = (id) => {
     return Like.findOneAndDelete({ _id: id });
 }
 
-export const deleteAllLikesByPostOrCommentId = (isPost, id) => {
+export const deleteAllLikesByPostOrCommentId = (id) => {
     return Like.deleteMany({ likedObject: id });
 }
 
-export const getLikesByUserId = (userId) => {
+export const getAllLikesByUserId = (userId) => {
     return Like.find({ user: userId });
 }
 

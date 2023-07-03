@@ -14,6 +14,6 @@ export const getAllUserPostsByUserId = (id) => {
     return Post.find({ user: id });
 }
 
-export const deletePost = (id) => {
+export const deletePostFromDB = (id) => {
     return Post.findOneAndDelete({ _id: id });
 }

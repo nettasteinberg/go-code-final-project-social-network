@@ -1,7 +1,7 @@
-import { addComment, deleteComment, getAllCommentsByPostId, getCommentById } from "../services/Comment.js";
-import { deleteAllLikesByPostOrCommentId, getAllLikesByPostOrCommentId } from "../services/Like.js";
+import { addComment, deleteCommentFromDB, getAllCommentsByPostId, getCommentById } from "../services/Comment.js";
 import { getPostById } from "../services/Post.js";
 import serverResponse from "../utils/serverResponse.js";
+import { deleteLikesOnCommentOrPost } from "./Like.js";
 
 export const addCommentController = async (req, res) => {
     try {
@@ -78,20 +78,15 @@ export const updateCommentByCommentIdController = async (req, res) => {
     }
 }
 
-export const deleteLikesOnComment = async (commentId) => {
-    const arrayOfLikesOnComment = await getAllLikesByPostOrCommentId(false, commentId);
-    const deleteLikesResponse = await deleteAllLikesByPostOrCommentId(false, commentId);
-    console.log(`Delete ${deleteLikesResponse.deletedCount} likes of comment ${commentId}`);
-    if (deleteLikesResponse.deletedCount !== arrayOfLikesOnComment.length) {
-        console.log(`Not all likes of comment ${commentId} were deleted from the DB`);
-    }
-    return await deleteComment(commentId);
+export const deleteComment = async (commentId,) => {
+    await deleteLikesOnCommentOrPost(commentId, false);
+    return await deleteCommentFromDB(commentId);
 }
 
 export const deleteCommentByIdController = async (req, res) => {
     try {
         const commentId = req.params.id;
-        const deletedComment = await deleteLikesOnComment(commentId);
+        const deletedComment = await deleteComment(commentId);
         if (!deletedComment) {
             return serverResponse(res, 404, { message: "Comment doesn't exist" });
         }

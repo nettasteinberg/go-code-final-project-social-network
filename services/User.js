@@ -14,6 +14,11 @@ export const addUser = async (newUser) => {
     return user;
 }
 
-export const deleteUserById = (id) => {
+export const updateUser = async (user) => {
+    await user.save();
+    return user;
+}
+
+export const deleteUserFromDBById = (id) => {
     return User.findOneAndDelete({_id:id});
 }
