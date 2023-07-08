@@ -1,6 +1,5 @@
 import { getAllCommentsByPostId } from "../services/Comment.js";
 import { addPost, deletePostFromDB, getAllUserPostsByUserId, getPostById } from "../services/Post.js";
-import { getUserById } from "../services/User.js";
 import serverResponse from "../utils/serverResponse.js";
 import { deleteComment } from "./Comment.js";
 import { deleteLikesOnCommentOrPost } from "./Like.js";
@@ -23,14 +22,14 @@ export const addPostController = async (req, res) => {
 
 export const getAllPostsByUserIdController = async (req, res) => {
     try {
-        const id = req.params.id;
-        const user = await getUserById(id);
+        const user = req.user;
         if (!user) {
             return serverResponse(res, 404, { message: "User doesn't exist" });
         }
-        const posts = await getAllUserPostsByUserId(id);
+        const posts = await getAllUserPostsByUserId(user._id);
         return serverResponse(res, 200, posts);
     } catch (e) {
+        console.log(e.message);
         return serverResponse(res, 500, {
             message: "Internal error while trying to get all posts by user"
         });

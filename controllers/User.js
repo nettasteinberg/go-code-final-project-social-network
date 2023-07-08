@@ -33,7 +33,7 @@ export const addUserController = async (req, res) => {
         const user = await addUser(newUser);
         
         const accessToken = jwt.sign(user.toJSON(), ACCESS_TOKEN_SECRET);
-        return res.status(200).json({ accessToken: accessToken});
+        return res.cookie("access_token_" + user._id, accessToken, { maxAge: 300000, httpOnly: true}).status(200).send(user);
     } catch (e) {
         console.log(e.message);
         return serverResponse(res, 500, e);

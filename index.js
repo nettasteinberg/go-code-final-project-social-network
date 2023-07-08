@@ -2,12 +2,14 @@ import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { addFriendController, addUserController, deleteUserController, getAllFriendsByUserIdController, getUserByIdController, updateUserController, updateUserPasswordController } from "./controllers/User.js";
 import { addPostController, deletePostByIdController, getAllPostsByUserIdController, getPostByPostIdController, updatePostByPostIdController } from "./controllers/Post.js";
 import { addCommentController, deleteCommentByIdController, getAllCommentsByPostIdController, getCommentByCommentIdController, updateCommentByCommentIdController } from "./controllers/Comment.js";
 import { addLikeToPostOrCommentController, deleteLikeByIdController, getLikeByIdController } from "./controllers/Like.js";
+import { authenticateToken } from "./utils/authenticateToken.js";
 
 dotenv.config();
 
@@ -20,6 +22,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.static('client/build'));
+app.use(cookieParser());
 
 /* ********************************************************************************************************************* */
 
@@ -32,7 +35,7 @@ app.put("/api/addFriend", addFriendController);
 app.delete("/api/user/:id", deleteUserController);
 
 app.post("/api/post", addPostController);
-app.get("/api/posts/:id", getAllPostsByUserIdController);
+app.get("/api/posts/:id", authenticateToken, getAllPostsByUserIdController);
 app.get("/api/post/:id", getPostByPostIdController);
 app.put("/api/post/:id", updatePostByPostIdController);
 app.delete("/api/post/:id", deletePostByIdController);

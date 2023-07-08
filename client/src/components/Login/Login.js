@@ -20,7 +20,6 @@ const createUser = async () => {
     console.log(await response.json());
 }
 
-
 const Login = () => {
     return (
         <div className="divLoginInput">
