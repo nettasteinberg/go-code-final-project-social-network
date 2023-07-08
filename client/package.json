@@ -2,16 +2,14 @@
   "name": "nettanet",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "jsonwebtoken": "^9.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "mongoose": "^7.3.1",
-    "nodemon": "^2.0.22",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.1",
@@ -22,9 +20,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "dev": "concurrently \"nodemon index.js\" \"cd client && npm start\"",
-    "render-postbuild": "cd client && yarn install && yarn build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -43,8 +39,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.0"
   }
 }

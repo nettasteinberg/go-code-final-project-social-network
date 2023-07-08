@@ -8,15 +8,22 @@ import { hashPassword } from "../utils/hashPassword.js";
 import serverResponse from "../utils/serverResponse.js";
 import { deleteComment } from "./Comment.js";
 import { deletePost } from "./Post.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const { ACCESS_TOKEN_SECRET } = process.env;
 
 export const addUserController = async (req, res) => {
     try {
         const newUser = { ...req.body };
         if (Object.keys(newUser).length === 0) {
-            serverResponse(res, 400, "Bad request");
+            return serverResponse(res, 400, "Bad request");
         }
+        const email = newUser.email;
         const emailRegex = new RegExp(/^[A-Za-z0-9_!#$%&'*+/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/, "gm");
-        if (!emailRegex.test(newUser.email)) {
+        if (!emailRegex.test(email)) {
             return serverResponse(res, 400, { message: "The email is not in valid form" });
         }
         if (!enforceStrongPassword(req.body.password)) {
@@ -24,9 +31,12 @@ export const addUserController = async (req, res) => {
         }
         newUser.password = await hashPassword(req.body.password);
         const user = await addUser(newUser);
-        serverResponse(res, 200, user);
+        
+        const accessToken = jwt.sign(user.toJSON(), ACCESS_TOKEN_SECRET);
+        return res.status(200).json({ accessToken: accessToken});
     } catch (e) {
-        serverResponse(res, 500, e);
+        console.log(e.message);
+        return serverResponse(res, 500, e);
     }
 }
 

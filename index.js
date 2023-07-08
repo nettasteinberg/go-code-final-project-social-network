@@ -25,7 +25,7 @@ app.use(express.static('client/build'));
 
 app.get("/api/user/:id", getUserByIdController);
 app.get("/api/user/friends/:id", getAllFriendsByUserIdController);
-app.post("/api/user", addUserController);
+app.post("/api/register", addUserController);
 app.put("/api/user/:id", updateUserController);
 app.put("/api/user/password/:id", updateUserPasswordController);
 app.put("/api/addFriend", addFriendController);

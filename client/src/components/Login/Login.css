@@ -1,0 +1,9 @@
+.divLoginInput {
+    width: 15rem;
+    margin: 0;
+}
+
+.loginInput {
+    display: flex;
+    justify-content: space-between;
+}
