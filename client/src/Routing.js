@@ -5,19 +5,23 @@ import App from './App.js'
 import { Context } from './Context.js';
 import LoginPage from './pages/LoginPage/LoginPage.js';
 import "./Routing.css"
+import Login from './components/Login/Login.js';
+import UserPage from './pages/UserPage/UserPage.js';
+import MainPage from './pages/MainPage/MainPage.js';
 
 const Routing = () => {
 
-    // const navigate = useNavigate();
+    
 
     return (
         <BrowserRouter>
             <Context.Provider value={{}}>
-                <Link to="/" style={{ textDecoration: 'none', marginRight: 5, color: 'blue' }}>Home</Link>
-                <Link to="login" style={{ textDecoration: 'none', marginRight: 5, color: 'blue' }}>Login</Link>
+                <Link to="/" >Home</Link>
+                <Link to="login" >Sign in/Login</Link>
                 <Routes>
-                    <Route path="/" element={<App />} />
-                    <Route path="login" element={<LoginPage />} />
+                    <Route path="/" element={<MainPage />} />
+                    <Route path="login" element={<Login />} />
+                    <Route path="user/:id" element={<UserPage/>} />
                     <Route path="*" element={<Navigate to="/" replace />} /> 
                 </Routes>
             </Context.Provider>

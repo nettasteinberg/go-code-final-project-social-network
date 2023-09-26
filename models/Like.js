@@ -8,7 +8,7 @@ const likeSchema = new Schema({
     },
     likedObject: { 
         type: Schema.Types.ObjectId, 
-        refPath: 'model_type',
+        refPath: 'modelType',
         required: true, 
     },
     modelType: { 

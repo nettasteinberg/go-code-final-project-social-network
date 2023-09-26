@@ -1,7 +1,7 @@
 import { User } from "../models/User.js"
 
 export const getUserById = (id) => {
-    return User.findOne({_id:id});
+    return User.findOne({_id:id}).select("-password -__v");
 }
 
 export const getUserByEmail = (email) => {
@@ -21,4 +21,14 @@ export const updateUser = async (user) => {
 
 export const deleteUserFromDBById = (id) => {
     return User.findOneAndDelete({_id:id});
+}
+
+/* *************************************** */
+
+export const getNumberOfUsers = () => {
+    return User.countDocuments({});
+}
+
+export const deleteAllUsers = () => {
+    return User.deleteMany({});
 }

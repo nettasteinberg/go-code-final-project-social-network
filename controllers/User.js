@@ -1,7 +1,7 @@
 import { getAllCommentsByUserId } from "../services/Comment.js";
 import { deleteUserLikesByUserId } from "../services/Like.js";
 import { getAllUserPostsByUserId } from "../services/Post.js";
-import { addUser, deleteUserFromDBById, getUserById, updateUser } from "../services/User.js";
+import { addUser, deleteAllUsers, deleteUserFromDBById, getNumberOfUsers, getUserById, updateUser } from "../services/User.js";
 import { passwordAllowedUpdate, userAllowedUpdates } from "../utils/allowedUpdates.js";
 import { enforceStrongPassword } from "../utils/enforceStrongPassword.js";
 import { hashPassword } from "../utils/hashPassword.js";
@@ -13,9 +13,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { ACCESS_TOKEN_SECRET } = process.env;
+const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ONE_MINUTE_IN_MILLISECONDS, ONE_DAY_IN_MILLISECONDS } = process.env;
 
-export const addUserController = async (req, res) => {
+export const signInController = async (req, res) => {
     try {
         const newUser = { ...req.body };
         if (Object.keys(newUser).length === 0) {
@@ -31,13 +31,64 @@ export const addUserController = async (req, res) => {
         }
         newUser.password = await hashPassword(req.body.password);
         const user = await addUser(newUser);
-        
-        const accessToken = jwt.sign(user.toJSON(), ACCESS_TOKEN_SECRET);
-        return res.cookie("access_token_" + user._id, accessToken, { maxAge: 300000, httpOnly: true}).status(200).send(user);
+
+        const accessToken = generateAccessToken(user);
+        res.cookie("accessToken", accessToken, { maxAge: ONE_MINUTE_IN_MILLISECONDS * 10, httpOnly: true});
+        const refreshToken = jwt.sign(user.toJSON(), REFRESH_TOKEN_SECRET);
+        res.cookie("refreshToken", refreshToken, { maxAge: ONE_DAY_IN_MILLISECONDS * 30, httpOnly: true});
+        console.log("new user signed in: ", user._id);
+        return serverResponse(res, 200, user);
     } catch (e) {
         console.log(e.message);
         return serverResponse(res, 500, e);
     }
+}
+
+export const generateAccessToken = (user) => {
+    return jwt.sign(user.toJSON(), ACCESS_TOKEN_SECRET, { expiresIn: ONE_MINUTE_IN_MILLISECONDS * 10 });
+}
+
+export const checkAccessTokenController = async (req, res) => {
+    try {
+        console.log("checkAccessTokenController entry");
+        const accessToken = req.cookies["accessToken"];
+        console.log("access token", accessToken);
+        if (accessToken === undefined) {
+            const refreshToken = req.cookies["refreshToken"];
+            console.log("refresh token", refreshToken);
+            if (refreshToken === undefined) {
+                console.log("The refresh token has expired, you need to login again");
+                return serverResponse(res, 401, { message: "Token not found. The user cannot be authenticated." });
+            }
+            jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+                if (err) {
+                    return serverResponse(res, 403, { message: "The refresh token couldn't be verified" });
+                }
+                console.log("generating new access token");
+                const accessToken = generateAccessToken(user);
+                res.cookie("accessToken", accessToken, { maxAge: ONE_MINUTE_IN_MILLISECONDS * 10, httpOnly: true });
+            });
+        }
+        jwt.verify(accessToken, ACCESS_TOKEN_SECRET, (err, user) => {
+            if (err) {
+                return serverResponse(res, 403, { message: "The access token couldn't be verified" });
+                // return res.status(403).send({message: "The token couldn't be verified"});
+            }
+            return serverResponse(res, 200, user);
+        });
+    } catch (e) {
+        return serverResponse(res, 500, {
+            message: "Internal error while trying to check access token"
+        });
+    }
+}
+
+export const logoutController = async (req, res) => {
+    deleteUser(req.user);
+    res.clearCookie("accessToken", { httpOnly: true});
+    res.clearCookie("refreshToken", { httpOnly: true});
+    res.clearCookie("undefined");
+    serverResponse(res, 200, { message: "Logged out successfully!" });
 }
 
 export const getUserByIdController = async (req, res) => {
@@ -87,14 +138,14 @@ const deleteUser = async (user) => {
 
 const deleteUserFromFriendsLists = async (user) => {
     const friendsOfUserToDelete = [...user.friends];
-        for (const friendId of friendsOfUserToDelete) {
-            const friendToDeleteUserFrom = await getUserById(friendId);
-            const newFriendsList = [...friendToDeleteUserFrom.friends];
-            const ind = newFriendsList.findIndex(friendId => friendId.toString() === user._id);
-            newFriendsList.splice(ind, 1);
-            friendToDeleteUserFrom.friends = newFriendsList;
-            await updateUser(friendToDeleteUserFrom);
-        }
+    for (const friendId of friendsOfUserToDelete) {
+        const friendToDeleteUserFrom = await getUserById(friendId);
+        const newFriendsList = [...friendToDeleteUserFrom.friends];
+        const ind = newFriendsList.findIndex(friendId => friendId.toString() === user._id);
+        newFriendsList.splice(ind, 1);
+        friendToDeleteUserFrom.friends = newFriendsList;
+        await updateUser(friendToDeleteUserFrom);
+    }
 }
 
 export const deleteUserController = async (req, res) => {
@@ -180,4 +231,14 @@ export const addFriendController = async (req, res) => {
             message: "Internal error while trying to add a user to the friends list"
         });
     }
+}
+
+/* ******************************* auxiliary controllers ******************************* */
+export const deleteAllUsersController = async (req, res) => {
+    const numberOfUsers = await getNumberOfUsers();
+    const deletedUsers = await deleteAllUsers();
+    if (deletedUsers.deletedCount !== numberOfUsers) {
+        return serverResponse(res, 404, { message: `Failed to delete all the users` });
+    }
+    return serverResponse(res, 200, deletedUsers);
 }

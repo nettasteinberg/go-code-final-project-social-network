@@ -1,0 +1,29 @@
+.mainPage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+.mainPageLogin {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+.clickHereToLogin {
+    display: flex;
+    justify-content: flex-start;
+    align-items:flex-start;
+}
+
+.clickHereToLogin > p {
+    margin: 0;
+}
+
+.clickHereToLogin > a {
+    margin: 0 3px;
+}
+

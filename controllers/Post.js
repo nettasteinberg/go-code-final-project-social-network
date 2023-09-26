@@ -22,11 +22,13 @@ export const addPostController = async (req, res) => {
 
 export const getAllPostsByUserIdController = async (req, res) => {
     try {
+        console.log("req.user in getAllPostsByUserIdController", req.user)
         const user = req.user;
         if (!user) {
             return serverResponse(res, 404, { message: "User doesn't exist" });
         }
         const posts = await getAllUserPostsByUserId(user._id);
+        console.log("posts:", posts);
         return serverResponse(res, 200, posts);
     } catch (e) {
         console.log(e.message);
